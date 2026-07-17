@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistem Terjemahan Rintas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <img src="{{ url_for('static', filename='images/logo.jpg') }}" class="logo">
+
+    <h1>SISTEM TERJEMAHAN RINTAS</h1>
+
+    <p class="subtitle">
+      <div class="jumlah">
+    📚 Jumlah Perkataan Dalam Kamus
+    <br>
+    <span>{{ jumlah_perkataan }}</span> Perkataan
+</div>
+Sistem Carian dan Terjemahan Perkataan Rintas
+</p>
+    <form method="POST">
+        <input type="text" name="perkataan" placeholder="Masukkan perkataan..." required>
+        <br><br>
+        <button type="submit">CARI</button>
+    </form>
+
+    <h2>{{ hasil }}</h2>
+
+</div>
+
+</body>
+</html>
