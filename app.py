@@ -1,17 +1,38 @@
 from flask import Flask, render_template, request
-import pandas as pd
+import firebase_admin
+from firebase_admin import credentials, firestore
+import os
 
 app = Flask(__name__)
 
-# Baca fail Excel
-df = pd.read_excel("kamus.xlsx")
+# Sambung Firebase
+cred = credentials.Certificate(
+    "sistem-terjemahan-rintas-firebase-adminsdk-fbsvc-0006ce7902.json"
+)
 
-# Kemas nama lajur
-df.columns = df.columns.str.strip().str.lower()
+firebase_admin.initialize_app(cred)
+
+db = firestore.client()
+
+
+# Ambil data kamus dari Firebase
+def ambil_kamus():
+    data = []
+
+    docs = db.collection("kamus").stream()
+
+    for doc in docs:
+        data.append(doc.to_dict())
+
+    return data
+
 
 @app.route("/", methods=["GET", "POST"])
 def home():
+
     hasil = ""
+
+    data_kamus = ambil_kamus()
 
     if request.method == "POST":
 
@@ -23,16 +44,22 @@ def home():
 
         for perkataan in senarai_perkataan:
 
-            cari = df[df["perkataan"].astype(str).str.lower() == perkataan]
+            jumpa = False
 
-            if not cari.empty:
-                hasil_terjemahan.append(str(cari.iloc[0]["rintas"]))
-            else:
+            for item in data_kamus:
+
+                if item["perkataan"].lower() == perkataan:
+                    hasil_terjemahan.append(item["rintas"])
+                    jumpa = True
+                    break
+
+            if not jumpa:
                 hasil_terjemahan.append(f"[{perkataan}]")
 
         hasil = " ".join(hasil_terjemahan)
 
-    jumlah_perkataan = len(df)
+
+    jumlah_perkataan = len(data_kamus)
 
     return render_template(
         "index.html",
@@ -40,6 +67,26 @@ def home():
         jumlah_perkataan=jumlah_perkataan
     )
 
+
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+
+    if request.method == "POST":
+
+        perkataan_baru = request.form.get("perkataan")
+        rintas_baru = request.form.get("rintas")
+
+        db.collection("kamus").add({
+            "perkataan": perkataan_baru,
+            "rintas": rintas_baru
+        })
+
+
+    return render_template("admin.html")
+
+
 if __name__ == "__main__":
-    import os
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000))
+    )
