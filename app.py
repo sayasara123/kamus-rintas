@@ -2,13 +2,14 @@ from flask import Flask, render_template, request
 import firebase_admin
 from firebase_admin import credentials, firestore
 import os
+import json
 
 app = Flask(__name__)
 
-# Sambung Firebase
-cred = credentials.Certificate(
-    "sistem-terjemahan-rintas-firebase-adminsdk-fbsvc-0006ce7902.json"
-)
+# Sambung Firebase (Render)
+firebase_key = json.loads(os.environ.get("FIREBASE_KEY"))
+
+cred = credentials.Certificate(firebase_key)
 
 firebase_admin.initialize_app(cred)
 
