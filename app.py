@@ -29,7 +29,14 @@ def home():
 
         hasil = ' '.join(hasil_terjemahan)
 
-    return render_template('index.html', hasil=hasil)
+    # Kira jumlah perkataan dalam Excel
+    jumlah_perkataan = len(df)
+
+    return render_template(
+        'index.html',
+        hasil=hasil,
+        jumlah_perkataan=jumlah_perkataan
+    )
 
 if __name__ == '__main__':
     app.run()
