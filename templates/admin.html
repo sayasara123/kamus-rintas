@@ -1,24 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="ms">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Kamus Rintas</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
-<h1>Tambah Perkataan Kamus</h1>
+<div class="container">
 
-<form method="POST">
+    <h1>⚙️ Admin Kamus Rintas</h1>
 
-    <label>Perkataan:</label><br>
-    <input type="text" name="perkataan"><br><br>
+    <p class="subtitle">
+        Tambah perkataan baru ke dalam kamus Rintas
+    </p>
 
-    <label>Rintas:</label><br>
-    <input type="text" name="rintas"><br><br>
+    {% if mesej %}
+    <div class="hasil">
+        {{ mesej }}
+    </div>
+    {% endif %}
 
-    <button type="submit">Tambah</button>
+    <form method="POST">
 
-</form>
+        <label><b>Perkataan</b></label><br>
+        <input type="text" name="perkataan" placeholder="Contoh: diterjemahkan" required>
+        <br><br>
+
+        <label><b>Rintas</b></label><br>
+        <input type="text" name="rintas" placeholder="Contoh: dtr" required>
+        <br><br>
+
+        <button type="submit">➕ Tambah Perkataan</button>
+
+    </form>
+
+    <br>
+
+    <a href="/">⬅️ Kembali ke laman utama</a>
+
+</div>
 
 </body>
 </html>

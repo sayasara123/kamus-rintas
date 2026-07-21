@@ -9,8 +9,12 @@ df = pd.read_excel('kamus.xlsx')
 # Kemas nama lajur
 df.columns = df.columns.str.strip().str.lower()
 
+# =========================
+# HALAMAN UTAMA
+# =========================
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    global df
     hasil = ''
 
     if request.method == 'POST':
@@ -29,7 +33,7 @@ def home():
 
         hasil = ' '.join(hasil_terjemahan)
 
-    # Kira jumlah perkataan dalam Excel
+    # Kira jumlah perkataan
     jumlah_perkataan = len(df)
 
     return render_template(
@@ -38,5 +42,42 @@ def home():
         jumlah_perkataan=jumlah_perkataan
     )
 
+# =========================
+# HALAMAN ADMIN
+# =========================
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    global df
+    mesej = ''
+
+    if request.method == 'POST':
+        perkataan = request.form.get('perkataan', '').strip().lower()
+        rintas = request.form.get('rintas', '').strip()
+
+        if perkataan and rintas:
+
+            # Elak duplicate
+            if perkataan in df['perkataan'].astype(str).str.lower().values:
+                mesej = f'Perkataan "{perkataan}" sudah wujud!'
+            else:
+                # Data baru
+                data_baru = pd.DataFrame({
+                    'perkataan': [perkataan],
+                    'rintas': [rintas]
+                })
+
+                # Tambah ke dataframe
+                df = pd.concat([df, data_baru], ignore_index=True)
+
+                # Simpan semula ke Excel
+                df.to_excel('kamus.xlsx', index=False)
+
+                mesej = f'Perkataan "{perkataan}" berjaya ditambah!'
+
+    return render_template('admin.html', mesej=mesej)
+
+# =========================
+# JALANKAN APP
+# =========================
 if __name__ == '__main__':
     app.run()
